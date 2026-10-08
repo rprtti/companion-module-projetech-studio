@@ -1,6 +1,7 @@
 import type { CompanionVariableDefinition, CompanionVariableValues } from '@companion-module/base'
 import type { StudioInstance } from './main.js'
 
+/** Variables `input_1_name` … `input_32_name` are defined for the first 32 inputs of the list. */
 const MAX_INPUTS = 32
 
 export function getVariableDefinitions(): CompanionVariableDefinition[] {
@@ -22,6 +23,7 @@ const mmss = (ms: number): string => {
 	return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
 }
 
+/** Values computed from the current state; StudioInstance.updateVariables sends only the ones that changed. */
 export function getVariableValues(instance: StudioInstance): CompanionVariableValues {
 	const st = instance.api.state
 	const active = instance.api.inputByNumber(st.active)

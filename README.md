@@ -15,6 +15,7 @@ yarn            # install
 yarn build      # compile to dist/ (enough for Companion to load it)
 yarn dev        # compile in watch mode
 yarn lint       # eslint + prettier
+yarn test       # build, then protocol tests against a local fake of the Projetech Studio API
 yarn package    # build the distributable .tgz
 ```
 

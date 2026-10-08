@@ -6,6 +6,10 @@ export const GREEN = combineRgb(0, 160, 0)
 export const WHITE = combineRgb(255, 255, 255)
 export const BLACK = combineRgb(0, 0, 0)
 
+/**
+ * Boolean feedbacks. Tally comes from the pushed vMix tally string (one digit per input: 0 off, 1 program, 2 preview);
+ * the other flags come from activator pushes and the polled XML state.
+ */
 export function getFeedbacks(instance: StudioInstance): CompanionFeedbackDefinitions {
 	const api = instance.api
 	return {

@@ -1,8 +1,12 @@
 import { Regex, type SomeCompanionConfigField } from '@companion-module/base'
 
+/** Connection settings, edited in the connection's configuration page. */
 export interface StudioConfig {
+	/** IP of the PC running Projetech Studio. */
 	host: string
+	/** TCP API port, set in Projetech Studio under Saída / Config → API (8099 by default). */
 	port: number
+	/** How often the XML state is polled, in ms. Tally and activators are pushed and do not depend on it. */
 	pollInterval: number
 }
 

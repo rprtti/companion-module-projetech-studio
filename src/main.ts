@@ -1,4 +1,10 @@
-import { InstanceBase, InstanceStatus, runEntrypoint, type SomeCompanionConfigField } from '@companion-module/base'
+import {
+	InstanceBase,
+	InstanceStatus,
+	runEntrypoint,
+	type CompanionVariableValues,
+	type SomeCompanionConfigField,
+} from '@companion-module/base'
 import { getConfigFields, type StudioConfig } from './config.js'
 import { StudioApi } from './api.js'
 import { getActions } from './actions.js'
@@ -6,12 +12,19 @@ import { getFeedbacks } from './feedbacks.js'
 import { getVariableDefinitions, getVariableValues } from './variables.js'
 import { getPresets } from './presets.js'
 
+/**
+ * Companion connection for Projetech Studio. The TCP protocol lives in StudioApi; this class wires it to Companion
+ * (definitions, configuration, status, variables).
+ */
 export class StudioInstance extends InstanceBase<StudioConfig> {
 	public config: StudioConfig = { host: '127.0.0.1', port: 8099, pollInterval: 500 }
 	public readonly api = new StudioApi(this)
+	/** Last values sent to Companion, so each update only sends the variables that changed. */
+	private lastVariables: CompanionVariableValues = {}
 
 	async init(config: StudioConfig): Promise<void> {
 		this.config = config
+		this.lastVariables = {}
 		this.setActionDefinitions(getActions(this))
 		this.setFeedbackDefinitions(getFeedbacks(this))
 		this.setVariableDefinitions(getVariableDefinitions())
@@ -33,8 +46,20 @@ export class StudioInstance extends InstanceBase<StudioConfig> {
 		return getConfigFields()
 	}
 
+	/** Called after every state change (several times a second while a clip plays): sends only the changed values. */
 	updateVariables(): void {
-		this.setVariableValues(getVariableValues(this))
+		const values = getVariableValues(this)
+		const changed: CompanionVariableValues = {}
+		let any = false
+		for (const [id, value] of Object.entries(values)) {
+			if (this.lastVariables[id] !== value) {
+				changed[id] = value
+				any = true
+			}
+		}
+		if (!any) return
+		this.lastVariables = values
+		this.setVariableValues(changed)
 	}
 
 	private reconnect(): void {

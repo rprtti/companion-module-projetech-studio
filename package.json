@@ -1,6 +1,6 @@
 {
 	"name": "projetech-studio",
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"main": "dist/main.js",
 	"type": "module",
 	"scripts": {
@@ -9,6 +9,7 @@
 		"build": "rimraf dist && run build:main",
 		"build:main": "tsc -p tsconfig.build.json",
 		"dev": "tsc -p tsconfig.build.json --watch",
+		"test": "run build && node --test \"test/**/*.test.mjs\"",
 		"lint:raw": "eslint",
 		"lint": "run lint:raw ."
 	},

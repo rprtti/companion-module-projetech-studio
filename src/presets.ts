@@ -1,6 +1,10 @@
 import { combineRgb, type CompanionOptionValues, type CompanionPresetDefinitions } from '@companion-module/base'
 import { RED, GREEN, WHITE } from './feedbacks.js'
 
+/**
+ * Ready-made buttons: one per input (1–16) that loads it on preview and lights green on preview and red on air, plus
+ * the switcher controls. Companion rewrites the `$(projetech-studio:…)` prefix to the connection's label.
+ */
 export function getPresets(): CompanionPresetDefinitions {
 	const presets: CompanionPresetDefinitions = {}
 	for (let i = 1; i <= 16; i++) {

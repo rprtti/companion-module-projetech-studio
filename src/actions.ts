@@ -1,6 +1,12 @@
 import type { CompanionActionDefinitions } from '@companion-module/base'
 import type { StudioInstance } from './main.js'
 
+/**
+ * Actions map to Projetech Studio API functions (same names and parameters as vMix functions, e.g. `Cut`, `Fade`,
+ * `PreviewInput`, `SetVolume`). Inputs are numbered in the order of the Projetech Studio list, starting at 1.
+ */
+
+/** Input number option; for actions where it is optional, 0 means "the input on preview" (or the program). */
 const inputOption = (label = 'Input (número na lista; 0 = o que está no preview)') => ({
 	type: 'number' as const,
 	id: 'input',
@@ -12,6 +18,7 @@ const inputOption = (label = 'Input (número na lista; 0 = o que está no previe
 
 export function getActions(instance: StudioInstance): CompanionActionDefinitions {
 	const api = instance.api
+	/** `Input=n` only when a specific input was chosen; without it the API acts on the preview/program input. */
 	const withInput = (n: unknown): Record<string, number> => (Number(n) > 0 ? { Input: Number(n) } : {})
 
 	return {
@@ -254,6 +261,7 @@ export function getActions(instance: StudioInstance): CompanionActionDefinitions
 					ev.options.cmd === 'SetCountdown' ? { Value: String(ev.options.value) } : {},
 				),
 		},
+		// Escape hatch for API functions without a dedicated action; the text is sent as typed.
 		raw: {
 			name: 'Função livre (FUNCTION da API)',
 			options: [

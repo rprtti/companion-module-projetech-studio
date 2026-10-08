@@ -10,6 +10,12 @@ The module's labels are in Portuguese (Brazil), the language of Projetech Studio
 2. Add a **Projetech Studio** connection and fill in **IP do Projetech Studio** (the PC running it, `127.0.0.1` on the same PC) and **Porta TCP** (8099).
 3. Drag buttons from _Presets → Projetech Studio_: one button per input (1–16) with tally (green on preview, red on air), plus CUT, FADE, STOP, FTB, REC, STREAM, LED output and Output 2.
 
+### Troubleshooting
+
+- **Connection stays red or orange:** check that Projetech Studio is open, that the IP and port match _Saída / Config → API_ and that both PCs are on the same network. The Projetech Studio installer allows it through Windows Firewall; any other firewall must allow TCP 8099.
+- **A button lights up for the wrong input:** inputs are numbered by their position in the Projetech Studio list, so moving items changes their numbers.
+- **Buttons go dark when the connection drops:** tally is cleared until Projetech Studio answers again, so an old program/preview is never shown.
+
 ### Actions
 
 Cut, Fade (optional duration), Preview input, Take (input straight to air), Stop (back to the wait screen), Fade to black, Play / Pause / Play-Pause / Restart, input loop, overlays, input audio to program, input and master volume, recording, streaming, LED output, Output 2, timer (start / pause / reset / set) and a free API function.
@@ -32,6 +38,12 @@ Controla o **Projetech Studio** pela TCP API (compatível com vMix), porta 8099 
 - **IP do Projetech Studio**: IP do PC onde o Projetech Studio está aberto (`127.0.0.1` no mesmo PC).
 - **Porta TCP**: a porta configurada em _Saída / Config → API_ (padrão 8099).
 - **Intervalo de atualização**: com que frequência o estado (XML) é lido para variáveis e feedbacks (padrão 500 ms). O tally chega por push, independente disso.
+
+### Problemas comuns
+
+- **Conexão fica vermelha ou laranja:** confira se o Projetech Studio está aberto, se o IP e a porta batem com _Saída / Config → API_ e se os dois PCs estão na mesma rede. O instalador do Projetech Studio libera o programa no Firewall do Windows; outro firewall precisa liberar a porta TCP 8099.
+- **O botão acende no input errado:** os inputs são numerados pela posição na lista do Projetech Studio; mover itens na lista muda os números.
+- **Os botões apagam quando a conexão cai:** o tally é zerado até o Projetech Studio responder de novo, para nunca mostrar um programa/preview antigo.
 
 ### Ações
 
