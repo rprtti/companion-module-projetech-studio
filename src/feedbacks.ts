@@ -77,5 +77,33 @@ export function getFeedbacks(instance: StudioInstance): CompanionFeedbackDefinit
 			options: [],
 			callback: () => api.state.fadeToBlack,
 		},
+		syncRole: {
+			type: 'boolean',
+			name: 'Papel na sincronia é…',
+			description: 'Sincronia master/slave: verdadeiro quando este Projetech Studio tem o papel escolhido',
+			defaultStyle: { bgcolor: GREEN, color: WHITE },
+			options: [
+				{
+					type: 'dropdown',
+					id: 'role',
+					label: 'Papel',
+					default: 'master',
+					choices: [
+						{ id: 'master', label: 'MASTER' },
+						{ id: 'slave', label: 'SLAVE' },
+						{ id: 'standalone', label: 'Independente' },
+					],
+				},
+			],
+			callback: (fb) => api.state.connected && api.state.sync.role === fb.options.role,
+		},
+		connected: {
+			type: 'boolean',
+			name: 'Conectado ao Projetech Studio',
+			description: 'A conexão do Companion com este Projetech Studio está ativa',
+			defaultStyle: { bgcolor: GREEN, color: WHITE },
+			options: [],
+			callback: () => api.state.connected,
+		},
 	}
 }

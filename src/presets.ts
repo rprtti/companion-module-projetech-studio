@@ -54,5 +54,39 @@ export function getPresets(): CompanionPresetDefinitions {
 	simple('stream', 'STREAM', 'streaming', { cmd: 'StartStopStreaming', slot: 0 }, 'streaming')
 	simple('output', 'SAÍDA\\nLED', 'output', { cmd: 'Fullscreen' }, 'output')
 	simple('aux', 'SAÍDA 2', 'aux', { cmd: 'StartStopExternal' }, 'aux')
+
+	// Master/slave link: the role of this computer (green MASTER, blue SLAVE) and the two takeovers.
+	presets['sync_role'] = {
+		type: 'button',
+		category: 'Sincronia',
+		name: 'Papel na sincronia',
+		style: {
+			text: '$(projetech-studio:sync_role)\\n$(projetech-studio:sync_partner)',
+			size: '14',
+			color: WHITE,
+			bgcolor: combineRgb(40, 44, 56),
+		},
+		steps: [{ down: [], up: [] }],
+		feedbacks: [
+			{ feedbackId: 'syncRole', options: { role: 'master' }, style: { bgcolor: GREEN, color: WHITE } },
+			{ feedbackId: 'syncRole', options: { role: 'slave' }, style: { bgcolor: combineRgb(47, 59, 232), color: WHITE } },
+		],
+	}
+	presets['sync_takeover'] = {
+		type: 'button',
+		category: 'Sincronia',
+		name: 'Assumir como master',
+		style: { text: 'ASSUMIR\\nMASTER', size: '14', color: WHITE, bgcolor: combineRgb(120, 80, 0) },
+		steps: [{ down: [{ actionId: 'syncTakeOver', options: {} }], up: [] }],
+		feedbacks: [{ feedbackId: 'syncRole', options: { role: 'master' }, style: { bgcolor: GREEN, color: WHITE } }],
+	}
+	presets['sync_stream'] = {
+		type: 'button',
+		category: 'Sincronia',
+		name: 'Assumir transmissão',
+		style: { text: 'ASSUMIR\\nSTREAM', size: '14', color: WHITE, bgcolor: combineRgb(120, 0, 0) },
+		steps: [{ down: [{ actionId: 'syncTakeStream', options: {} }], up: [] }],
+		feedbacks: [{ feedbackId: 'streaming', options: {}, style: { bgcolor: RED, color: WHITE } }],
+	}
 	return presets
 }

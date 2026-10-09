@@ -18,14 +18,24 @@ The module's labels are in Portuguese (Brazil), the language of Projetech Studio
 
 ### Actions
 
-Cut, Fade (optional duration), Preview input, Take (input straight to air), Stop (back to the wait screen), Fade to black, Play / Pause / Play-Pause / Restart, input loop, overlays, input audio to program, input and master volume, recording, streaming, LED output, Output 2, timer (start / pause / reset / set) and a free API function.
+Cut, Fade (optional duration), Preview input, Take (input straight to air), Stop (back to the wait screen), Fade to black, Play / Pause / Play-Pause / Restart, input loop, overlays, input audio to program, input and master volume, recording, streaming, LED output, Output 2, timer (start / pause / reset / set), master/slave take over and take the stream, and a free API function.
 
 Inputs are numbered in the order of the Projetech Studio list (1, 2, 3…). Where an action asks for an input, 0 means "whatever is on preview".
 
 ### Feedbacks and variables
 
-- Feedbacks: input tally (program or preview), recording, streaming, LED output on, Output 2 on, fade to black.
-- Variables: `active_number`, `active_name`, `preview_number`, `preview_name`, `program_remaining`, `recording`, `streaming`, `input_N_name`.
+- Feedbacks: input tally (program or preview), recording, streaming, LED output on, Output 2 on, fade to black, master/slave role, connected.
+- Variables: `active_number`, `active_name`, `preview_number`, `preview_name`, `program_remaining`, `recording`, `streaming`, `input_N_name`, `connected`, `sync_role`, `sync_partner`, `sync_state`.
+
+### Master/slave: switch the hardware switcher when the master fails
+
+Two Projetech Studio computers can be linked as master and slave (Projetech Studio 1.2+, _Sincronia_ tab): the slave mirrors everything and takes over by itself when the master stops answering. To make Companion switch your hardware switcher (ATEM, Roland…) to the slave at that moment:
+
+1. Add **two** Projetech Studio connections, one per computer (e.g. `studio_a` = master, `studio_b` = slave).
+2. Create a **Trigger** with the event _Variable changed_ and two conditions: `$(studio_b:sync_role)` = `master` **and** `$(studio_a:connected)` = `0`.
+3. As its action, cut the switcher to the input that carries computer B.
+
+The second condition matters: if only the network between the two computers failed, A is still alive (and connected to Companion), so the switcher is left alone. The actions _Sincronia: assumir como master_ and _Sincronia: assumir a transmissão_ are accepted by the slave too.
 
 ---
 
@@ -47,7 +57,7 @@ Controla o **Projetech Studio** pela TCP API (compatível com vMix), porta 8099 
 
 ### Ações
 
-Cut, Fade (com duração), Preview Input, Take (Active Input), Stop (tela de espera), Play / Pause / Play-Pause / Restart, Loop, Overlay (liga/desliga/alternar), Áudio para o PGM, Volume do input, Volume master, Gravação, Streaming, Saída LED, Saída 2, Timer (iniciar / pausar / zerar / definir), Fade to Black e Função livre da API.
+Cut, Fade (com duração), Preview Input, Take (Active Input), Stop (tela de espera), Play / Pause / Play-Pause / Restart, Loop, Overlay (liga/desliga/alternar), Áudio para o PGM, Volume do input, Volume master, Gravação, Streaming, Saída LED, Saída 2, Timer (iniciar / pausar / zerar / definir), Fade to Black, Sincronia: assumir como master, Sincronia: assumir a transmissão e Função livre da API.
 
 Os inputs são numerados na ordem da lista do Projetech Studio (1, 2, 3…). Onde a ação pede um input, 0 significa "o que estiver no preview".
 
@@ -55,11 +65,22 @@ Os inputs são numerados na ordem da lista do Projetech Studio (1, 2, 3…). Ond
 
 - **Tally do input**: vermelho no ar, verde no preview (o botão muda de cor).
 - **Gravando**, **Transmitindo**, **Saída LED ligada**, **Saída 2 ligada**, **Fade to black**.
+- **Papel na sincronia é…** (MASTER, SLAVE ou independente) e **Conectado ao Projetech Studio**.
 
 ### Variáveis
 
-`active_number`, `active_name`, `preview_number`, `preview_name`, `program_remaining`, `recording`, `streaming`, `input_N_name`.
+`active_number`, `active_name`, `preview_number`, `preview_name`, `program_remaining`, `recording`, `streaming`, `input_N_name`, `connected` (1 enquanto o Companion está conectado a este Projetech Studio), `sync_role` (`master`, `slave` ou `independente`), `sync_partner`, `sync_state`.
+
+### Master/slave: trocar o switcher quando o master cai
+
+Dois computadores com Projetech Studio podem ser ligados como master e slave (Projetech Studio 1.2 ou mais novo, aba _Sincronia_): o slave espelha tudo e assume sozinho quando o master para de responder. Para o Companion trocar o switcher de vídeo (ATEM, Roland…) para o slave nesse momento:
+
+1. Crie **duas** conexões Projetech Studio, uma para cada computador (ex.: `studio_a` = master, `studio_b` = slave).
+2. Crie um **Trigger** com o evento _Variável mudou_ e duas condições: `$(studio_b:sync_role)` = `master` **e** `$(studio_a:connected)` = `0`.
+3. Como ação, corte o switcher para a entrada que recebe o computador B.
+
+A segunda condição é importante: se só a rede entre os dois computadores caiu, o A continua vivo (e conectado ao Companion), e o switcher não é trocado. As ações _Sincronia: assumir como master_ e _Sincronia: assumir a transmissão_ também funcionam no slave.
 
 ### Presets
 
-Um botão por input (1–16) com tally, mais CUT, FADE, STOP, FTB, REC, STREAM, Saída LED e Saída 2.
+Um botão por input (1–16) com tally, mais CUT, FADE, STOP, FTB, REC, STREAM, Saída LED e Saída 2. Na categoria _Sincronia_: o papel deste computador (verde MASTER, azul SLAVE), ASSUMIR MASTER e ASSUMIR STREAM.

@@ -22,6 +22,7 @@ const xml = [
 	'  <external>False</external>',
 	'  <streaming>False</streaming>',
 	'  <fullscreen>True</fullscreen>',
+	'  <sync role="Slave" state="Ready" connected="True" partner="PC-PALCO" partnerAddress="192.168.0.10:48761" term="3" promoted="False" partnerStreaming="True" />',
 	'</vmix>',
 ].join('\r\n')
 
@@ -116,6 +117,15 @@ test('reads the XML state, counting its length in UTF-8 bytes', () => {
 	assert.equal(api.inputByNumber(1)?.duration, 61000)
 })
 
+test('reads the master/slave link and the connection state', () => {
+	assert.equal(api.state.connected, true)
+	assert.equal(api.state.sync.role, 'slave')
+	assert.equal(api.state.sync.partner, 'PC-PALCO')
+	assert.equal(api.state.sync.linked, true)
+	assert.equal(api.state.sync.partnerStreaming, true)
+	assert.equal(api.state.sync.promoted, false)
+})
+
 test('keeps the line that arrives right after the XML document', () => {
 	assert.equal(api.state.tally, '102')
 })
@@ -140,4 +150,6 @@ test('clears the state when the connection drops', async () => {
 	assert.equal(api.state.tally, '')
 	assert.equal(api.state.inputs.length, 0)
 	assert.equal(api.state.recording, false)
+	assert.equal(api.state.connected, false)
+	assert.equal(api.state.sync.role, 'standalone')
 })

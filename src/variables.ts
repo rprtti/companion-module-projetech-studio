@@ -13,10 +13,16 @@ export function getVariableDefinitions(): CompanionVariableDefinition[] {
 		{ variableId: 'program_remaining', name: 'Tempo restante do programa (mm:ss)' },
 		{ variableId: 'recording', name: 'Gravando (1/0)' },
 		{ variableId: 'streaming', name: 'Transmitindo (1/0)' },
+		{ variableId: 'connected', name: 'Companion conectado a este Projetech Studio (1/0)' },
+		{ variableId: 'sync_role', name: 'Papel na sincronia master/slave (master, slave, independente)' },
+		{ variableId: 'sync_partner', name: 'Computador parceiro na sincronia' },
+		{ variableId: 'sync_state', name: 'Estado da sincronia (Ready, Syncing, WaitingPartner, DualMaster…)' },
 	]
 	for (let i = 1; i <= MAX_INPUTS; i++) defs.push({ variableId: `input_${i}_name`, name: `Nome do input ${i}` })
 	return defs
 }
+
+const SYNC_ROLE_TEXT = { master: 'master', slave: 'slave', standalone: 'independente' } as const
 
 const mmss = (ms: number): string => {
 	const s = Math.max(0, Math.floor(ms / 1000))
@@ -36,6 +42,10 @@ export function getVariableValues(instance: StudioInstance): CompanionVariableVa
 		program_remaining: active && active.duration > 0 ? mmss(active.duration - active.position) : '',
 		recording: st.recording ? 1 : 0,
 		streaming: st.streaming ? 1 : 0,
+		connected: st.connected ? 1 : 0,
+		sync_role: st.connected ? SYNC_ROLE_TEXT[st.sync.role] : '',
+		sync_partner: st.sync.partner,
+		sync_state: st.sync.state,
 	}
 	for (let i = 1; i <= MAX_INPUTS; i++) values[`input_${i}_name`] = instance.api.inputByNumber(i)?.title ?? ''
 	return values

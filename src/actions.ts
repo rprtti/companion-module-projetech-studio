@@ -261,6 +261,17 @@ export function getActions(instance: StudioInstance): CompanionActionDefinitions
 					ev.options.cmd === 'SetCountdown' ? { Value: String(ev.options.value) } : {},
 				),
 		},
+		// Master/slave link: accepted on the slave too (every other command goes to the master).
+		syncTakeOver: {
+			name: 'Sincronia: assumir como master (no slave)',
+			options: [],
+			callback: async () => api.sendFunction('SyncTakeOver'),
+		},
+		syncTakeStream: {
+			name: 'Sincronia: assumir a transmissão',
+			options: [],
+			callback: async () => api.sendFunction('SyncTakeStream'),
+		},
 		// Escape hatch for API functions without a dedicated action; the text is sent as typed.
 		raw: {
 			name: 'Função livre (FUNCTION da API)',

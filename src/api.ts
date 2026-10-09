@@ -32,6 +32,27 @@ export interface StudioState {
 	fadeToBlack: boolean
 	/** vMix tally string: one digit per input in list order, 0 = off, 1 = program, 2 = preview. */
 	tally: string
+	/** This module's TCP connection to Projetech Studio is up (the failover recipe checks the other computer with it). */
+	connected: boolean
+	/** Master/slave link of this Projetech Studio with another one (the `<sync>` element of the XML state). */
+	sync: SyncState
+}
+
+/** Role of this computer on the master/slave link. */
+export type SyncRole = 'master' | 'slave' | 'standalone'
+
+export interface SyncState {
+	role: SyncRole
+	/** "Ready", "Syncing", "WaitingPartner", "DualMaster"… */
+	state: string
+	/** Linked to the partner right now. */
+	linked: boolean
+	partner: string
+	partnerAddress: string
+	/** This computer took over after its master stopped answering or closed. */
+	promoted: boolean
+	/** The partner is streaming ("Assumir transmissão" is possible here). */
+	partnerStreaming: boolean
 }
 
 /** State flags driven by activator pushes ("ACTS OK <name> <0|1>") and by the XML state. */
@@ -51,6 +72,16 @@ const MAX_BUFFER_BYTES = 8 * 1024 * 1024
 /** An XML request that got no answer for this long is considered lost and is sent again. */
 const XML_RESPONSE_TIMEOUT_MS = 5000
 
+const emptySync = (): SyncState => ({
+	role: 'standalone',
+	state: '',
+	linked: false,
+	partner: '',
+	partnerAddress: '',
+	promoted: false,
+	partnerStreaming: false,
+})
+
 const emptyState = (): StudioState => ({
 	inputs: [],
 	active: 0,
@@ -61,7 +92,11 @@ const emptyState = (): StudioState => ({
 	external: false,
 	fadeToBlack: false,
 	tally: '',
+	connected: false,
+	sync: emptySync(),
 })
+
+const ROLES: Record<string, SyncRole> = { Master: 'master', Slave: 'slave' }
 
 /**
  * Client for the Projetech Studio TCP API (port 8099), which follows the vMix TCP API:
@@ -104,6 +139,8 @@ export class StudioApi {
 		this.socket.on('error', (err) => this.instance.log('error', `TCP: ${err.message}`))
 		this.socket.on('connect', () => {
 			this.instance.updateStatus(InstanceStatus.Ok)
+			this.state.connected = true
+			this.afterStateChange(true)
 			this.xmlRequestedAt = 0
 			this.send('SUBSCRIBE TALLY')
 			this.send('SUBSCRIBE ACTS')
@@ -230,6 +267,18 @@ export class StudioApi {
 			this.state.fullscreen = String(doc.fullscreen) === 'True'
 			this.state.external = String(doc.external) === 'True'
 			this.state.fadeToBlack = String(doc.fadeToBlack) === 'True'
+			const sync = doc.sync as Record<string, string> | undefined
+			this.state.sync = sync
+				? {
+						role: ROLES[sync.role ?? ''] ?? 'standalone',
+						state: sync.state ?? '',
+						linked: sync.connected === 'True',
+						partner: sync.partner ?? '',
+						partnerAddress: sync.partnerAddress ?? '',
+						promoted: sync.promoted === 'True',
+						partnerStreaming: sync.partnerStreaming === 'True',
+					}
+				: emptySync()
 			this.afterStateChange(this.flagSignature() !== flagsBefore)
 		} catch (err) {
 			this.instance.log('debug', `XML inválido: ${err instanceof Error ? err.message : String(err)}`)
@@ -238,13 +287,27 @@ export class StudioApi {
 
 	private flagSignature(): string {
 		const s = this.state
-		return [s.recording, s.streaming, s.fullscreen, s.external, s.fadeToBlack].map(Number).join('')
+		return [
+			s.recording,
+			s.streaming,
+			s.fullscreen,
+			s.external,
+			s.fadeToBlack,
+			s.connected,
+			s.sync.linked,
+			s.sync.promoted,
+			s.sync.partnerStreaming,
+		]
+			.map(Number)
+			.join('')
+			.concat(s.sync.role, s.sync.state)
 	}
 
 	/** Variables only send what changed (see StudioInstance.updateVariables); feedbacks are re-checked when a flag changed. */
 	private afterStateChange(flagsChanged: boolean): void {
 		this.instance.updateVariables()
-		if (flagsChanged) this.instance.checkFeedbacks('recording', 'streaming', 'output', 'aux', 'fadeToBlack')
+		if (flagsChanged)
+			this.instance.checkFeedbacks('recording', 'streaming', 'output', 'aux', 'fadeToBlack', 'syncRole', 'connected')
 	}
 
 	private clearState(): void {
