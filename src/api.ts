@@ -17,6 +17,14 @@ export interface StudioInput {
 	loop: boolean
 }
 
+/** An auxiliary output ("Saída 2" to "Saída 5"): a multiview, one input or the program on another monitor. */
+export interface AuxOutputState {
+	number: number
+	active: boolean
+	/** "Multiview", "Input" or "Program". */
+	mode: string
+}
+
 /** Everything the module knows about Projetech Studio; feedbacks and variables are computed from this. */
 export interface StudioState {
 	inputs: StudioInput[]
@@ -27,8 +35,10 @@ export interface StudioState {
 	streaming: boolean
 	/** LED output window on. */
 	fullscreen: boolean
-	/** Output 2 (multiview / input) on. */
+	/** Output 2 on (vMix's external output; pushed by the External activator). */
 	external: boolean
+	/** Every auxiliary output, Saída 2 first (the `<auxOutputs>` element; empty for Projetech Studio before 1.2.12). */
+	auxOutputs: AuxOutputState[]
 	fadeToBlack: boolean
 	/** vMix tally string: one digit per input in list order, 0 = off, 1 = program, 2 = preview. */
 	tally: string
@@ -90,6 +100,7 @@ const emptyState = (): StudioState => ({
 	streaming: false,
 	fullscreen: false,
 	external: false,
+	auxOutputs: [],
 	fadeToBlack: false,
 	tally: '',
 	connected: false,
@@ -180,6 +191,12 @@ export class StudioApi {
 		return this.state.inputs.find((i) => i.number === n)
 	}
 
+	/** Auxiliary output `n` is on; Saída 2 follows `<external>` and its activator, so it works with any version. */
+	auxActive(n: number): boolean {
+		if (n <= 2) return this.state.external
+		return this.state.auxOutputs.find((o) => o.number === n)?.active ?? false
+	}
+
 	/** Polls the XML state, unless the previous request is still unanswered (a slow peer must not pile up requests). */
 	private requestXml(): void {
 		if (!this.socket?.isConnected) return
@@ -267,6 +284,13 @@ export class StudioApi {
 			this.state.fullscreen = String(doc.fullscreen) === 'True'
 			this.state.external = String(doc.external) === 'True'
 			this.state.fadeToBlack = String(doc.fadeToBlack) === 'True'
+			const rawAux = doc.auxOutputs?.auxOutput
+			const auxList: Record<string, string>[] = rawAux === undefined ? [] : Array.isArray(rawAux) ? rawAux : [rawAux]
+			this.state.auxOutputs = auxList.map((o) => ({
+				number: parseInt(o.number, 10) || 0,
+				active: o.active === 'True',
+				mode: o.mode ?? '',
+			}))
 			const sync = doc.sync as Record<string, string> | undefined
 			this.state.sync = sync
 				? {
@@ -300,7 +324,7 @@ export class StudioApi {
 		]
 			.map(Number)
 			.join('')
-			.concat(s.sync.role, s.sync.state)
+			.concat(s.sync.role, s.sync.state, s.auxOutputs.map((o) => `${o.number}${Number(o.active)}`).join(','))
 	}
 
 	/** Variables only send what changed (see StudioInstance.updateVariables); feedbacks are re-checked when a flag changed. */

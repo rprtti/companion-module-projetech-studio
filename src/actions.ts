@@ -16,6 +16,18 @@ const inputOption = (label = 'Input (número na lista; 0 = o que está no previe
 	max: 999,
 })
 
+/** Auxiliary output: "Saída 2" (vMix's external output) to "Saída 5" (Projetech Studio 1.2.11 or newer). */
+export const auxOutputOption = {
+	type: 'dropdown' as const,
+	id: 'output',
+	label: 'Saída',
+	default: 2,
+	choices: [2, 3, 4, 5].map((n) => ({ id: n, label: `Saída ${n}` })),
+}
+
+/** The output chosen; buttons made before the option existed act on Saída 2. */
+export const auxOutputNumber = (value: unknown): number => Number(value) || 2
+
 export function getActions(instance: StudioInstance): CompanionActionDefinitions {
 	const api = instance.api
 	/** `Input=n` only when a specific input was chosen; without it the API acts on the preview/program input. */
@@ -222,8 +234,9 @@ export function getActions(instance: StudioInstance): CompanionActionDefinitions
 			callback: async (ev) => api.sendFunction(String(ev.options.cmd)),
 		},
 		aux: {
-			name: 'Saída 2 (multiview / input)',
+			name: 'Saída auxiliar (Saída 2 a 5: multiview / input / programa)',
 			options: [
+				auxOutputOption,
 				{
 					type: 'dropdown',
 					id: 'cmd',
@@ -236,7 +249,11 @@ export function getActions(instance: StudioInstance): CompanionActionDefinitions
 					],
 				},
 			],
-			callback: async (ev) => api.sendFunction(String(ev.options.cmd)),
+			// Saída 2 goes without Value, as vMix clients and older Projetech Studio versions send it.
+			callback: async (ev) => {
+				const n = auxOutputNumber(ev.options.output)
+				api.sendFunction(String(ev.options.cmd), n > 2 ? { Value: n } : {})
+			},
 		},
 		timer: {
 			name: 'Timer',

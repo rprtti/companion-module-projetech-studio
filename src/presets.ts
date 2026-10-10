@@ -53,7 +53,17 @@ export function getPresets(): CompanionPresetDefinitions {
 	simple('rec', 'REC', 'recording', { cmd: 'StartStopRecording' }, 'recording')
 	simple('stream', 'STREAM', 'streaming', { cmd: 'StartStopStreaming', slot: 0 }, 'streaming')
 	simple('output', 'SAÍDA\\nLED', 'output', { cmd: 'Fullscreen' }, 'output')
-	simple('aux', 'SAÍDA 2', 'aux', { cmd: 'StartStopExternal' }, 'aux')
+	// One button per auxiliary output; Saída 2 keeps its preset id.
+	for (const n of [2, 3, 4, 5]) {
+		presets[n === 2 ? 'aux' : `aux_${n}`] = {
+			type: 'button',
+			category: 'Switcher',
+			name: `SAÍDA ${n}`,
+			style: { text: `SAÍDA ${n}`, size: '18', color: WHITE, bgcolor: combineRgb(40, 44, 56) },
+			steps: [{ down: [{ actionId: 'aux', options: { output: n, cmd: 'StartStopExternal' } }], up: [] }],
+			feedbacks: [{ feedbackId: 'aux', options: { output: n }, style: { bgcolor: RED, color: WHITE } }],
+		}
+	}
 
 	// Master/slave link: the role of this computer (green MASTER, blue SLAVE) and the two takeovers.
 	presets['sync_role'] = {

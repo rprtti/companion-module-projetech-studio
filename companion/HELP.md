@@ -8,7 +8,7 @@ The module's labels are in Portuguese (Brazil), the language of Projetech Studio
 
 1. In Projetech Studio, the API is on by default: _Saída / Config → API (compatível com vMix)_, TCP port 8099.
 2. Add a **Projetech Studio** connection and fill in **IP do Projetech Studio** (the PC running it, `127.0.0.1` on the same PC) and **Porta TCP** (8099).
-3. Drag buttons from _Presets → Projetech Studio_: one button per input (1–16) with tally (green on preview, red on air), plus CUT, FADE, STOP, FTB, REC, STREAM, LED output and Output 2.
+3. Drag buttons from _Presets → Projetech Studio_: one button per input (1–16) with tally (green on preview, red on air), plus CUT, FADE, STOP, FTB, REC, STREAM, LED output and Outputs 2 to 5.
 
 ### Troubleshooting
 
@@ -18,13 +18,13 @@ The module's labels are in Portuguese (Brazil), the language of Projetech Studio
 
 ### Actions
 
-Cut, Fade (optional duration), Preview input, Take (input straight to air), Stop (back to the wait screen), Fade to black, Play / Pause / Play-Pause / Restart, input loop, overlays, input audio to program, input and master volume, recording, streaming, LED output, Output 2, timer (start / pause / reset / set), master/slave take over and take the stream, and a free API function.
+Cut, Fade (optional duration), Preview input, Take (input straight to air), Stop (back to the wait screen), Fade to black, Play / Pause / Play-Pause / Restart, input loop, overlays, input audio to program, input and master volume, recording, streaming, LED output, auxiliary outputs (Output 2 to 5: multiview, one input or the program on another monitor; Outputs 3–5 need Projetech Studio 1.2.12 or newer), timer (start / pause / reset / set), master/slave take over and take the stream, and a free API function.
 
 Inputs are numbered in the order of the Projetech Studio list (1, 2, 3…). Where an action asks for an input, 0 means "whatever is on preview".
 
 ### Feedbacks and variables
 
-- Feedbacks: input tally (program or preview), recording, streaming, LED output on, Output 2 on, fade to black, master/slave role, connected.
+- Feedbacks: input tally (program or preview), recording, streaming, LED output on, auxiliary output (2 to 5) on, fade to black, master/slave role, connected.
 - Variables: `active_number`, `active_name`, `preview_number`, `preview_name`, `program_remaining`, `recording`, `streaming`, `input_N_name`, `connected`, `sync_role`, `sync_partner`, `sync_state`.
 
 ### Master/slave: switch the hardware switcher when the master fails
@@ -57,14 +57,14 @@ Controla o **Projetech Studio** pela TCP API (compatível com vMix), porta 8099 
 
 ### Ações
 
-Cut, Fade (com duração), Preview Input, Take (Active Input), Stop (tela de espera), Play / Pause / Play-Pause / Restart, Loop, Overlay (liga/desliga/alternar), Áudio para o PGM, Volume do input, Volume master, Gravação, Streaming, Saída LED, Saída 2, Timer (iniciar / pausar / zerar / definir), Fade to Black, Sincronia: assumir como master, Sincronia: assumir a transmissão e Função livre da API.
+Cut, Fade (com duração), Preview Input, Take (Active Input), Stop (tela de espera), Play / Pause / Play-Pause / Restart, Loop, Overlay (liga/desliga/alternar), Áudio para o PGM, Volume do input, Volume master, Gravação, Streaming, Saída LED, Saída auxiliar (Saída 2 a 5: multiview, um input ou o programa em outro monitor; as Saídas 3 a 5 pedem o Projetech Studio 1.2.12 ou mais novo), Timer (iniciar / pausar / zerar / definir), Fade to Black, Sincronia: assumir como master, Sincronia: assumir a transmissão e Função livre da API.
 
 Os inputs são numerados na ordem da lista do Projetech Studio (1, 2, 3…). Onde a ação pede um input, 0 significa "o que estiver no preview".
 
 ### Feedbacks
 
 - **Tally do input**: vermelho no ar, verde no preview (o botão muda de cor).
-- **Gravando**, **Transmitindo**, **Saída LED ligada**, **Saída 2 ligada**, **Fade to black**.
+- **Gravando**, **Transmitindo**, **Saída LED ligada**, **Saída auxiliar ligada** (Saída 2 a 5), **Fade to black**.
 - **Papel na sincronia é…** (MASTER, SLAVE ou independente) e **Conectado ao Projetech Studio**.
 
 ### Variáveis
@@ -83,4 +83,4 @@ A segunda condição é importante: se só a rede entre os dois computadores cai
 
 ### Presets
 
-Um botão por input (1–16) com tally, mais CUT, FADE, STOP, FTB, REC, STREAM, Saída LED e Saída 2. Na categoria _Sincronia_: o papel deste computador (verde MASTER, azul SLAVE), ASSUMIR MASTER e ASSUMIR STREAM.
+Um botão por input (1–16) com tally, mais CUT, FADE, STOP, FTB, REC, STREAM, Saída LED e Saídas 2 a 5. Na categoria _Sincronia_: o papel deste computador (verde MASTER, azul SLAVE), ASSUMIR MASTER e ASSUMIR STREAM.

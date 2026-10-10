@@ -22,6 +22,10 @@ const xml = [
 	'  <external>False</external>',
 	'  <streaming>False</streaming>',
 	'  <fullscreen>True</fullscreen>',
+	'  <auxOutputs>',
+	'    <auxOutput number="2" active="False" mode="Multiview" />',
+	'    <auxOutput number="3" active="True" mode="Program" />',
+	'  </auxOutputs>',
 	'  <sync role="Slave" state="Ready" connected="True" partner="PC-PALCO" partnerAddress="192.168.0.10:48761" term="3" promoted="False" partnerStreaming="True" />',
 	'</vmix>',
 ].join('\r\n')
@@ -126,6 +130,16 @@ test('reads the master/slave link and the connection state', () => {
 	assert.equal(api.state.sync.promoted, false)
 })
 
+test('reads the auxiliary outputs (Saída 2 follows <external>)', () => {
+	assert.deepEqual(api.state.auxOutputs, [
+		{ number: 2, active: false, mode: 'Multiview' },
+		{ number: 3, active: true, mode: 'Program' },
+	])
+	assert.equal(api.auxActive(2), false)
+	assert.equal(api.auxActive(3), true)
+	assert.equal(api.auxActive(4), false)
+})
+
 test('keeps the line that arrives right after the XML document', () => {
 	assert.equal(api.state.tally, '102')
 })
@@ -152,4 +166,5 @@ test('clears the state when the connection drops', async () => {
 	assert.equal(api.state.recording, false)
 	assert.equal(api.state.connected, false)
 	assert.equal(api.state.sync.role, 'standalone')
+	assert.deepEqual(api.state.auxOutputs, [])
 })

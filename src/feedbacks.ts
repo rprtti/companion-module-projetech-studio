@@ -1,5 +1,6 @@
 import { combineRgb, type CompanionFeedbackDefinitions } from '@companion-module/base'
 import type { StudioInstance } from './main.js'
+import { auxOutputOption, auxOutputNumber } from './actions.js'
 
 export const RED = combineRgb(200, 0, 0)
 export const GREEN = combineRgb(0, 160, 0)
@@ -63,11 +64,11 @@ export function getFeedbacks(instance: StudioInstance): CompanionFeedbackDefinit
 		},
 		aux: {
 			type: 'boolean',
-			name: 'Saída 2 ligada',
-			description: 'Multiview / input em outro monitor',
+			name: 'Saída auxiliar ligada',
+			description: 'Saída 2, 3, 4 ou 5 (multiview, input ou programa em outro monitor) ligada',
 			defaultStyle: { bgcolor: combineRgb(18, 196, 248), color: BLACK },
-			options: [],
-			callback: () => api.state.external,
+			options: [auxOutputOption],
+			callback: (fb) => api.auxActive(auxOutputNumber(fb.options.output)),
 		},
 		fadeToBlack: {
 			type: 'boolean',
